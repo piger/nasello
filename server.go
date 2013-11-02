@@ -39,7 +39,8 @@ func ServerHandler(addresses []string) handler {
 			nameserver = net.JoinHostPort(nameserver, "53")
 		}
 
-		log.Printf("Incoming request: %s %s %v - using %s\n",
+		log.Printf("Incoming request #%v: %s %s %v - using %s\n",
+			req.Id,
 			dns.ClassToString[req.Question[0].Qclass],
 			dns.TypeToString[req.Question[0].Qtype],
 			req.Question[0].Name, nameserver)
@@ -76,7 +77,7 @@ func ServerHandler(addresses []string) handler {
 				goto Redo
 			}
 
-			log.Printf("Query time: %.3d µs, server: %s(%s), size: %d bytes\n", rtt/1e3, nameserver, c.Net, resp.Len())
+			log.Printf("Query time #%v: %.3d µs, server: %s(%s), size: %d bytes\n", resp.Id, rtt/1e3, nameserver, c.Net, resp.Len())
 			w.WriteMsg(resp)
 			return
 		}
