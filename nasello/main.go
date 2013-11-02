@@ -3,12 +3,12 @@ package main
 
 import (
 	"flag"
-	"github.com/piger/nasello"
 	"github.com/miekg/dns"
-	"runtime"
+	"github.com/piger/nasello"
 	"log"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 )
 
@@ -29,7 +29,7 @@ func main() {
 
 	configuration := nasello.ReadConfig(*configFile)
 
-	for _, filter := range(configuration.Filters) {
+	for _, filter := range configuration.Filters {
 		log.Printf("Proxing %s on %v\n", filter.Pattern, filter.Addresses)
 		dns.HandleFunc(filter.Pattern, nasello.ServerHandler(filter.Addresses))
 	}
@@ -41,7 +41,7 @@ func main() {
 forever:
 	for {
 		select {
-		case s := <- sig:
+		case s := <-sig:
 			log.Printf("Signal (%d) received, stopping\n", s)
 			break forever
 		}

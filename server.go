@@ -12,8 +12,10 @@ package nasello
 import (
 	"github.com/miekg/dns"
 	"log"
+	"math/rand"
 	"net"
 	"strings"
+	"time"
 )
 
 type handler func(dns.ResponseWriter, *dns.Msg)
@@ -21,9 +23,17 @@ type handler func(dns.ResponseWriter, *dns.Msg)
 // Returns an anonymous function configured to resolve DNS
 // queries with a specific set of remote servers.
 func ServerHandler(addresses []string) handler {
+	randGen := rand.New(rand.NewSource(time.Now().UnixNano()))
 
+	// This is the actual handler
 	return func(w dns.ResponseWriter, req *dns.Msg) {
-		nameserver := addresses[0]
+		nameserver := addresses[randGen.Intn(len(addresses))]
+		const maxErrs int = 10
+
+		if len(req.Question) < 1 {
+			log.Printf("Empty DNS request (no questions)")
+			return
+		}
 
 		if !strings.Contains(nameserver, ":") {
 			nameserver = net.JoinHostPort(nameserver, "53")
@@ -37,13 +47,20 @@ func ServerHandler(addresses []string) handler {
 		c := new(dns.Client)
 		c.Net = "udp"
 
+		errCount := 0
 		resp, rtt, err := c.Exchange(req, nameserver)
 
 		for {
 
 		Redo:
+			if errCount >= maxErrs {
+				log.Printf("Too many errors (%d): giving up\n", errCount)
+				return
+			}
+
 			if err != nil {
 				log.Printf(";; ERROR: %s\n", err.Error())
+				errCount += 1
 				continue
 			}
 
