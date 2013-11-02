@@ -1,9 +1,9 @@
-// Configuration handling
-//
+package nasello
+
 // The configuration file is a JSON file with a simple structure; the following
 // configuration specify 3 forwarders: *.example.com and 10.1.2.* will be
 // resolved by OpenDNS and a catch-all for resolving with Google DNS.
-// 
+//
 // {
 //		"filters": [
 // 				{
@@ -29,24 +29,24 @@
 // 		]
 // }
 //
-package nasello
 
 import (
 	"encoding/json"
-	"log"
 	"io/ioutil"
+	"log"
 )
-
 
 type Configuration struct {
 	Filters []ConfigFilter
 }
 
 type ConfigFilter struct {
-	Pattern string
-	Addresses []string	
+	Pattern   string
+	Addresses []string
 }
 
+// ReadConfig reads a JSON file and returns a Configuration object
+// containing the raw elements.
 func ReadConfig(filename string) Configuration {
 	file, err := ioutil.ReadFile(filename)
 	if err != nil {
