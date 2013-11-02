@@ -14,6 +14,7 @@ import (
 
 var (
 	configFile = flag.String("config", "nasello.json", "Configuration file")
+	listenAddr = flag.String("listen", "localhost:8053", "Local bind address")
 )
 
 func serve(net string, address string) {
@@ -30,14 +31,16 @@ func main() {
 	configuration := nasello.ReadConfig(*configFile)
 
 	for _, filter := range configuration.Filters {
-		// Ensure that the pattern is a FQDN name
+		// Ensure that each pattern is a FQDN name
 		pattern := dns.Fqdn(filter.Pattern)
 
 		log.Printf("Proxing %s on %v\n", pattern, filter.Addresses)
 		dns.HandleFunc(pattern, nasello.ServerHandler(filter.Addresses))
 	}
-	go serve("tcp", ":8053")
-	go serve("udp", ":8053")
+
+	log.Printf("Listening on %s\n", *listenAddr)
+	go serve("tcp", *listenAddr)
+	go serve("udp", *listenAddr)
 
 	sig := make(chan os.Signal)
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
