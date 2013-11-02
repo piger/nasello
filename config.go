@@ -56,5 +56,16 @@ func ReadConfig(filename string) Configuration {
 	var jsonConfig Configuration
 	json.Unmarshal(file, &jsonConfig)
 
+	// Safety checks
+	if len(jsonConfig.Filters) == 0 {
+		log.Fatalf("Configuration contains no 'filters' section")
+	}
+
+	for _, filter := range jsonConfig.Filters {
+		if filter.Pattern == "" || len(filter.Addresses) == 0 {
+			log.Fatalf("Filter error: missing pattern or empty server list")
+		}
+	}
+
 	return jsonConfig
 }

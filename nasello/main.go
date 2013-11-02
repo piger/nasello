@@ -30,8 +30,11 @@ func main() {
 	configuration := nasello.ReadConfig(*configFile)
 
 	for _, filter := range configuration.Filters {
-		log.Printf("Proxing %s on %v\n", filter.Pattern, filter.Addresses)
-		dns.HandleFunc(filter.Pattern, nasello.ServerHandler(filter.Addresses))
+		// Ensure that the pattern is a FQDN name
+		pattern := dns.Fqdn(filter.Pattern)
+
+		log.Printf("Proxing %s on %v\n", pattern, filter.Addresses)
+		dns.HandleFunc(pattern, nasello.ServerHandler(filter.Addresses))
 	}
 	go serve("tcp", ":8053")
 	go serve("udp", ":8053")
