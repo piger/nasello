@@ -1,0 +1,16 @@
+{
+  "filters": [
+    {
+      "pattern": "example.com.",
+      "addresses": [ "208.67.222.222", "208.67.220.220" ]
+    },
+    {
+      "pattern": "25.1.10.in-addr.arpa.",
+      "addresses": [ "10.1.25.1", "10.1.25.2" ]
+    },
+    {
+      "pattern": ".",
+      "addresses": [ "8.8.8.8", "8.8.4.4" ]
+    }
+  ]
+}
