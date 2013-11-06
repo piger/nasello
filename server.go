@@ -29,6 +29,17 @@ func ServerHandler(addresses []string) handler {
 	return func(w dns.ResponseWriter, req *dns.Msg) {
 		nameserver := addresses[randGen.Intn(len(addresses))]
 		const maxErrs int = 10
+		var protocol string
+
+		switch t := w.RemoteAddr().(type) {
+		default:
+			log.Printf("ERROR: Unsupported protocol %T\n", t)
+			return
+		case *net.UDPAddr:
+			protocol = "udp"
+		case *net.TCPAddr:
+			protocol = "tcp"
+		}
 
 		if len(req.Question) < 1 {
 			log.Printf("Empty DNS request (no questions)")
@@ -46,7 +57,7 @@ func ServerHandler(addresses []string) handler {
 			req.Question[0].Name, nameserver)
 
 		c := new(dns.Client)
-		c.Net = "udp"
+		c.Net = protocol
 
 		errCount := 0
 		resp, rtt, err := c.Exchange(req, nameserver)
@@ -60,7 +71,7 @@ func ServerHandler(addresses []string) handler {
 			}
 
 			if err != nil {
-				log.Printf(";; ERROR: %s\n", err.Error())
+				log.Printf(";; ERROR (%d): %s\n", errCount, err.Error())
 				errCount += 1
 				continue
 			}
@@ -70,7 +81,7 @@ func ServerHandler(addresses []string) handler {
 				return
 			}
 
-			if resp.MsgHdr.Truncated {
+			if resp.MsgHdr.Truncated && protocol != "tcp" {
 				log.Printf("Truncated message, retrying TCP")
 				c.Net = "tcp"
 				resp, rtt, err = c.Exchange(req, nameserver)

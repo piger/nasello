@@ -27,9 +27,9 @@ func serve(net string, address string) {
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU() * 4)
 	flag.Parse()
+	log.Printf("Listening on %s\n", *listenAddr)
 
 	configuration := nasello.ReadConfig(*configFile)
-
 	for _, filter := range configuration.Filters {
 		// Ensure that each pattern is a FQDN name
 		pattern := dns.Fqdn(filter.Pattern)
@@ -38,7 +38,6 @@ func main() {
 		dns.HandleFunc(pattern, nasello.ServerHandler(filter.Addresses))
 	}
 
-	log.Printf("Listening on %s\n", *listenAddr)
 	go serve("tcp", *listenAddr)
 	go serve("udp", *listenAddr)
 
