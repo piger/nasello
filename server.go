@@ -14,7 +14,6 @@ import (
 	"log"
 	"math/rand"
 	"net"
-	"strings"
 	"time"
 )
 
@@ -44,10 +43,6 @@ func ServerHandler(addresses []string) handler {
 		if len(req.Question) < 1 {
 			log.Printf("Empty DNS request (no questions)")
 			return
-		}
-
-		if !strings.Contains(nameserver, ":") {
-			nameserver = net.JoinHostPort(nameserver, "53")
 		}
 
 		log.Printf("Incoming request #%v: %s %s %v - using %s\n",

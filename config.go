@@ -26,6 +26,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"log"
+	"strings"
 )
 
 type Configuration struct {
@@ -56,6 +57,12 @@ func ReadConfig(filename string) Configuration {
 	for _, filter := range jsonConfig.Filters {
 		if filter.Pattern == "" || len(filter.Addresses) == 0 {
 			log.Fatalf("Filter error: missing pattern or empty server list")
+		}
+
+		for i, address := range(filter.Addresses) {
+			if strings.Contains(address, ":") {
+				filter.Addresses[i] = strings.Join([]string{address, "53"}, ":")
+			}
 		}
 	}
 
