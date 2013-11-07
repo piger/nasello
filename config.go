@@ -59,8 +59,8 @@ func ReadConfig(filename string) Configuration {
 			log.Fatalf("Filter error: missing pattern or empty server list")
 		}
 
-		for i, address := range(filter.Addresses) {
-			if strings.Contains(address, ":") {
+		for i, address := range filter.Addresses {
+			if !strings.Contains(address, ":") {
 				filter.Addresses[i] = strings.Join([]string{address, "53"}, ":")
 			}
 		}

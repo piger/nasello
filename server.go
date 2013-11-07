@@ -27,7 +27,6 @@ func ServerHandler(addresses []string) handler {
 	// This is the actual handler
 	return func(w dns.ResponseWriter, req *dns.Msg) {
 		nameserver := addresses[randGen.Intn(len(addresses))]
-		const maxErrs int = 10
 		var protocol string
 
 		switch t := w.RemoteAddr().(type) {
@@ -40,52 +39,42 @@ func ServerHandler(addresses []string) handler {
 			protocol = "tcp"
 		}
 
-		if len(req.Question) < 1 {
-			log.Printf("Empty DNS request (no questions)")
-			return
+		for _, q := range req.Question {
+			log.Printf("Incoming request #%v: %s %s %v - using %s\n",
+				req.Id,
+				dns.ClassToString[q.Qclass],
+				dns.TypeToString[q.Qtype],
+				q.Name, nameserver)
 		}
-
-		log.Printf("Incoming request #%v: %s %s %v - using %s\n",
-			req.Id,
-			dns.ClassToString[req.Question[0].Qclass],
-			dns.TypeToString[req.Question[0].Qtype],
-			req.Question[0].Name, nameserver)
 
 		c := new(dns.Client)
 		c.Net = protocol
-
-		errCount := 0
 		resp, rtt, err := c.Exchange(req, nameserver)
 
-		for {
-
-		Redo:
-			if errCount >= maxErrs {
-				log.Printf("Too many errors (%d): giving up\n", errCount)
-				return
-			}
-
-			if err != nil {
-				log.Printf(";; ERROR (%d): %s\n", errCount, err.Error())
-				errCount += 1
-				continue
-			}
-
-			if req.Id != resp.Id {
-				log.Printf("Id mismatch: %v != %v\n", req.Id, resp.Id)
-				return
-			}
-
-			if resp.MsgHdr.Truncated && protocol != "tcp" {
-				log.Printf("Truncated message, retrying TCP")
-				c.Net = "tcp"
-				resp, rtt, err = c.Exchange(req, nameserver)
-				goto Redo
-			}
-
-			log.Printf("Query time #%v: %.3d µs, server: %s(%s), size: %d bytes\n", resp.Id, rtt/1e3, nameserver, c.Net, resp.Len())
-			w.WriteMsg(resp)
+	Redo:
+		switch {
+		case err != nil:
+			log.Printf("ERROR: %s\n", err.Error())
+			sendFailure(w, req)
 			return
+		case req.Id != resp.Id:
+			log.Printf("ERROR: Id mismatch: %v != %v\n", req.Id, resp.Id)
+			sendFailure(w, req)
+			return
+		case resp.MsgHdr.Truncated && protocol != "tcp":
+			log.Printf("WARNING: Truncated answer for request %v, retrying TCP\n", req.Id)
+			c.Net = "tcp"
+			resp, rtt, err = c.Exchange(req, nameserver)
+			goto Redo
 		}
-	}
+
+		log.Printf("Request #%v: %.3d µs, server: %s(%s), size: %d bytes\n", resp.Id, rtt/1e3, nameserver, c.Net, resp.Len())
+		w.WriteMsg(resp)
+	} // end of handler
+}
+
+func sendFailure(w dns.ResponseWriter, r *dns.Msg) {
+	msg := new(dns.Msg)
+	msg.SetRcode(r, dns.RcodeServerFailure)
+	w.WriteMsg(msg)
 }
