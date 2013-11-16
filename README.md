@@ -17,13 +17,12 @@ The latest release is available at [Github][github-src]
 
 [github-src]: https://github.com/piger/nasello
 
-### Building
+### Installing from source
 
-You can build nasello from source:
+You can install nasello from source:
 
-	git clone https://github.com/piger/nasello
-	cd nasello
-	go build github.com/piger/nasello
+	go get github.com/piger/nasello
+	go install github.com/piger/nasello/nasello
 
 ### Configuration format
 
