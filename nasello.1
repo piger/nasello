@@ -1,0 +1,56 @@
+.TH NASELLO 1 "SEPTEMBER 2014" "nasello 0.1" "Nasello Manual"
+.SH "NAME"
+nasello \- a DNS proxy server
+.SH "SYNOPSIS"
+.B nasello
+[\-address=<address>] \-config=<file>
+.SH "DESCRIPTION"
+A very simple DNS proxy server capable of routing client queries to
+different remote servers based on pattern matching. It can be useful
+for when you are very paranoid abour your DNS queries.
+.SH "OPTIONS"
+.TP
+.BR \-address =\fIADDRESS\fR
+Specify the address and port on which the server listens for connections
+(default \fB127.0.0.1:8053\fR).
+.TP
+.BR \-config =\fIFILE\fR
+Specify the path to the \fIJSON\fR configuration file.
+.SH "CONFIGURATION FORMAT"
+The configuration file is a JSON document which must contains a
+\fIfilters\fR list with one or more \fIpattern\fR dictionaries; each \fIfilter\fR
+must contain a \fBFQDN\fR DNS name as the \fIpattern\fR and a list of one or
+more remote DNS servers to forward the query to. For \fBreverse lookups\fR
+the \fIin-addr.arpa\fR domain must be used in the pattern definition.
+
+The "\fB.\fR" \fIpattern\fR specifies a default remote resolver.
+.SH "EXAMPLE"
+The following configuration example specifies three \fIfilters\fR:
+.TP
+\fB*.example.com\fR will be resolved by OpenDNS (208.67.222.222, etc.)
+.TP
+\fB10.0.24.*\fR will also be resolved by OpenDNS
+.TP
+all the other queries will be forwarded to Google DNS (8.8.8.8, etc.)
+.RS 2
+.nf
+{
+    "filters": [
+        {
+            "pattern": "example.com.",
+            "addresses": [ "208.67.222.222", "208.67.220.220" ]
+        },
+        {
+            "pattern": "24.0.10.in-addr.arpa.",
+            "addresses": [ "208.67.222.222", "208.67.220.220" ]
+        },
+        {
+            "pattern": ".",
+            "addresses": [ "8.8.8.8", "8.8.4.4" ]
+        }
+    ]
+}
+.fi
+.RE
+.SH "LICENSE"
+nasello is under the MIT license. See the LICENSE file for details.

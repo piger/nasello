@@ -19,10 +19,11 @@ The latest release is available at [Github][github-src]
 
 ### Installing from source
 
-You can install nasello from source:
+You can install nasello with the standard `go get`:
 
-	go get github.com/piger/nasello
-	go install github.com/piger/nasello/nasello
+	go install github.com/piger/nasello/cmd/nasello
+
+This command will install a copy of `nasello` inside `$GOPATH/bin/`.
 
 ### Configuration format
 
