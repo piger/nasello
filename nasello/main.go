@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/signal"
 	"runtime"
+	"strings"
 	"syscall"
 )
 
@@ -27,27 +28,28 @@ func serve(net string, address string) {
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU() * 4)
 	flag.Parse()
-	log.Printf("Listening on %s\n", *listenAddr)
 
 	configuration := nasello.ReadConfig(*configFile)
 	for _, filter := range configuration.Filters {
 		// Ensure that each pattern is a FQDN name
 		pattern := dns.Fqdn(filter.Pattern)
 
-		log.Printf("Proxing %s on %v\n", pattern, filter.Addresses)
+		log.Printf("Proxing %s on %v\n", pattern, strings.Join(filter.Addresses, ", "))
 		dns.HandleFunc(pattern, nasello.ServerHandler(filter.Addresses))
 	}
 
 	go serve("tcp", *listenAddr)
 	go serve("udp", *listenAddr)
 
-	sig := make(chan os.Signal)
+	log.Printf("Started DNS server on: %s\n", *listenAddr)
+
+	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
 forever:
 	for {
 		select {
 		case s := <-sig:
-			log.Printf("Signal (%d) received, stopping\n", s)
+			log.Printf("Signal (%s) received, stopping\n", s.String())
 			break forever
 		}
 	}

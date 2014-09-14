@@ -1,5 +1,12 @@
 package nasello
 
+import (
+	"encoding/json"
+	"io/ioutil"
+	"log"
+	"strings"
+)
+
 // The configuration file is a JSON file with a simple structure; the following
 // configuration specify 3 forwarders: *.example.com and 10.1.2.* will be
 // resolved by OpenDNS and a catch-all for resolving with Google DNS.
@@ -21,14 +28,6 @@ package nasello
 // 		]
 // }
 //
-
-import (
-	"encoding/json"
-	"io/ioutil"
-	"log"
-	"strings"
-)
-
 type Configuration struct {
 	Filters []ConfigFilter
 }
@@ -51,12 +50,12 @@ func ReadConfig(filename string) Configuration {
 
 	// Safety checks
 	if len(jsonConfig.Filters) == 0 {
-		log.Fatalf("Configuration contains no 'filters' section")
+		log.Fatal("Configuration contains no 'filters' section")
 	}
 
 	for _, filter := range jsonConfig.Filters {
 		if filter.Pattern == "" || len(filter.Addresses) == 0 {
-			log.Fatalf("Filter error: missing pattern or empty server list")
+			log.Fatal("Filter error: missing pattern or empty server list")
 		}
 
 		for i, address := range filter.Addresses {
