@@ -1,11 +1,13 @@
 language: go
 go:
 - 1.9
-before_script:
+install:
+- go get github.com/kardianos/govendor
 - go get github.com/golang/lint/golint
 - go get honnef.co/go/tools/cmd/megacheck
-- go get github.com/kardianos/govendor
+- govendor sync
 script:
+- test -z $(find . -path ./vendor -prune -o -name '*.go' -print | xargs gofmt -s -l)
 - go vet ./...
 - megacheck ./...
 - golint -set_exit_status $(go list ./...)
