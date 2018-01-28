@@ -8,7 +8,6 @@ import (
 	"log"
 	"os"
 	"os/signal"
-	"runtime"
 	"strings"
 	"syscall"
 )
@@ -26,7 +25,6 @@ func serve(net string, address string) {
 }
 
 func main() {
-	runtime.GOMAXPROCS(runtime.NumCPU() * 4)
 	flag.Parse()
 
 	configuration := nasello.ReadConfig(*configFile)
