@@ -1,0 +1,30 @@
+language: go
+go:
+- 1.9
+before_script:
+- go get github.com/golang/lint/golint
+- go get honnef.co/go/tools/cmd/megacheck
+- go get github.com/kardianos/govendor
+script:
+- go vet ./...
+- megacheck ./...
+- golint -set_exit_status $(go list ./...)
+- govendor test ./...
+before_deploy:
+- GOOS=linux GOARCH=amd64 govendor build ./cmd/nasello_linux_amd64
+- GOOS=linux GOARCH=386 govendor build ./cmd/nasello_linux_x86
+- GOOS=linux GOARCH=arm govendor build ./cmd/nasello_linux_arm
+- GOOS=darwin GOARCH=amd64 govendor build ./cmd/nasello_darwin_amd64
+deploy:
+  provider: releases
+  api_key:
+    secure: KFqK16N47cl+e7soFgdn6DBPKBp3zwQFlTnog/paxw43xVAZN2RCrWHu5FwZnwXRy2dJ5LTf/WueAqg0iQ9gq0N6U2Xa1R44qpIlSzLJZNkt1XTO2ivdVb/2wx2TsDIE465gC3CNhnfRxSXGCQCNqnpYllaUSAltYtxBNlEC7c0=
+  file:
+    - nasello_linux_amd64
+    - nasello_linux_x86
+    - nasello_linux_arm
+    - nasello_darwin_amd64
+  skip_cleanup: true
+  on:
+    repo: piger/nasello
+    tags: true
