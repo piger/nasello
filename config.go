@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// Configuration objects hold the routing configuration for nasello.
 // The configuration file is a JSON file with a simple structure; the following
 // configuration specify 3 forwarders: *.example.com and 10.1.2.* will be
 // resolved by OpenDNS and a catch-all for resolving with Google DNS.
@@ -29,10 +30,10 @@ import (
 // }
 //
 type Configuration struct {
-	Filters []ConfigFilter
+	Filters []configFilter
 }
 
-type ConfigFilter struct {
+type configFilter struct {
 	Pattern   string
 	Addresses []string
 }

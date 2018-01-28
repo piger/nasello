@@ -43,12 +43,6 @@ func main() {
 
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
-forever:
-	for {
-		select {
-		case s := <-sig:
-			log.Printf("Signal (%s) received, stopping\n", s.String())
-			break forever
-		}
-	}
+	recvSig := <-sig
+	log.Printf("Signal (%s) received, stopping\n", recvSig.String())
 }

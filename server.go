@@ -1,4 +1,4 @@
-// Nasello is a DNS proxy server.
+// Package nasello provides a simple DNS proxy server.
 //
 // It can be used to route DNS queries to different remote servers based on
 // pattern matching on the requested name.
@@ -17,11 +17,12 @@ import (
 	"time"
 )
 
-type handler func(dns.ResponseWriter, *dns.Msg)
+// Handler is the handler function that will serve DNS requests.
+type Handler func(dns.ResponseWriter, *dns.Msg)
 
-// Returns an anonymous function configured to resolve DNS
+// ServerHandler Returns an anonymous function configured to resolve DNS
 // queries with a specific set of remote servers.
-func ServerHandler(addresses []string) handler {
+func ServerHandler(addresses []string) Handler {
 	randGen := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	// This is the actual handler
