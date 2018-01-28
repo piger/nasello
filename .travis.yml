@@ -11,10 +11,10 @@ script:
 - golint -set_exit_status $(go list ./...)
 - govendor test ./...
 before_deploy:
-- GOOS=linux GOARCH=amd64 govendor build ./cmd/nasello_linux_amd64
-- GOOS=linux GOARCH=386 govendor build ./cmd/nasello_linux_x86
-- GOOS=linux GOARCH=arm govendor build ./cmd/nasello_linux_arm
-- GOOS=darwin GOARCH=amd64 govendor build ./cmd/nasello_darwin_amd64
+- GOOS=linux GOARCH=amd64 govendor build -o nasello_linux_amd64 ./cmd/nasello
+- GOOS=linux GOARCH=386 govendor build -o nasello_linux_x86 ./cmd/nasello
+- GOOS=linux GOARCH=arm govendor build -o nasello_linux_arm ./cmd/nasello
+- GOOS=darwin GOARCH=amd64 govendor build -o nasello_darwin_amd64 ./cmd/nasello
 deploy:
   provider: releases
   api_key:
