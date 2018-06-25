@@ -34,8 +34,9 @@ type Configuration struct {
 }
 
 type configFilter struct {
-	Pattern   string
-	Addresses []string
+	Pattern   string   `json:"pattern"`
+	Addresses []string `json:"addresses"`
+	Protocol  string   `json:"protocol"`
 }
 
 // ReadConfig reads a JSON file and returns a Configuration object

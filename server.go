@@ -22,30 +22,31 @@ type Handler func(dns.ResponseWriter, *dns.Msg)
 
 // ServerHandler Returns an anonymous function configured to resolve DNS
 // queries with a specific set of remote servers.
-func ServerHandler(addresses []string) Handler {
+func ServerHandler(addresses []string, protocol string) Handler {
 	randGen := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	// This is the actual handler
 	return func(w dns.ResponseWriter, req *dns.Msg) {
 		nameserver := addresses[randGen.Intn(len(addresses))]
-		var protocol string
 
-		switch t := w.RemoteAddr().(type) {
-		default:
-			log.Printf("ERROR: Unsupported protocol %T\n", t)
-			return
-		case *net.UDPAddr:
-			protocol = "udp"
-		case *net.TCPAddr:
-			protocol = "tcp"
+		if protocol == "" {
+			switch t := w.RemoteAddr().(type) {
+			default:
+				log.Printf("ERROR: Unsupported protocol %T\n", t)
+				return
+			case *net.UDPAddr:
+				protocol = "udp"
+			case *net.TCPAddr:
+				protocol = "tcp"
+			}
 		}
 
 		for _, q := range req.Question {
-			log.Printf("Incoming request #%v: %s %s %v - using %s\n",
+			log.Printf("Incoming request #%v: %s %s %v - using %s(%s)\n",
 				req.Id,
 				dns.ClassToString[q.Qclass],
 				dns.TypeToString[q.Qtype],
-				q.Name, nameserver)
+				q.Name, nameserver, protocol)
 		}
 
 		c := new(dns.Client)

@@ -33,6 +33,8 @@ must contain a *FQDN* DNS name as the `pattern` and a list of one or
 more remote DNS servers to forward the query to. For *reverse lookups*
 the `in-addr.arpa` domain must be used in the pattern definition.
 
+To use DNS-over-HTTPS see the example below.
+
 The "." `pattern` specifies a default remote resolver.
 
 ### Example
@@ -46,22 +48,28 @@ The following configuration example specifies three `filters`:
 
 `nasello.json`:
 
-	{
-		"filters": [
-				{
-						"pattern": "example.com.",
-						"addresses": [ "208.67.222.222", "208.67.220.220" ]
-				},
-				{
-						"pattern": "24.0.10.in-addr.arpa.",
-						"addresses": [ "208.67.222.222", "208.67.220.220" ]
-				},
-				{
-						"pattern": ".",
-						"addresses": [ "8.8.8.8", "8.8.4.4" ]
-				}
-		]
-	}
+    {
+      "filters": [
+        {
+          "pattern": "example.com.",
+          "addresses": [ "208.67.222.222", "208.67.220.220" ]
+        },
+        {
+          "pattern": "25.1.10.in-addr.arpa.",
+          "addresses": [ "10.1.25.1", "10.1.25.2" ]
+        },
+        {
+          "pattern": "google.com.",
+          "addresses": [ "8.8.8.8", "8.8.4.4" ]
+        },
+        {
+          "pattern": ".",
+          "addresses": [ "1.1.1.1:853" ],
+          "protocol": "tcp-tls"
+        }
+      ]
+    }
+
 
 ## License
 

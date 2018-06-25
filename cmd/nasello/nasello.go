@@ -32,8 +32,8 @@ func main() {
 		// Ensure that each pattern is a FQDN name
 		pattern := dns.Fqdn(filter.Pattern)
 
-		log.Printf("Proxing %s on %v\n", pattern, strings.Join(filter.Addresses, ", "))
-		dns.HandleFunc(pattern, nasello.ServerHandler(filter.Addresses))
+		log.Printf("Proxing %s on %v(%s)\n", pattern, strings.Join(filter.Addresses, ", "), filter.Protocol)
+		dns.HandleFunc(pattern, nasello.ServerHandler(filter.Addresses, filter.Protocol))
 	}
 
 	go serve("tcp", *listenAddr)
