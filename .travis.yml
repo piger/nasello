@@ -1,22 +1,22 @@
 language: go
 go:
 - 1.10.3
+before_install:
+  - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+  - dep ensure
 install:
-- go get github.com/kardianos/govendor
 - go get github.com/golang/lint/golint
 - go get honnef.co/go/tools/cmd/megacheck
-- govendor sync
 script:
 - test -z $(find . -path ./vendor -prune -o -name '*.go' -print | xargs gofmt -s -l)
 - go vet ./...
 - megacheck ./...
 - golint -set_exit_status $(go list ./...)
-- govendor test ./...
 before_deploy:
-- GOOS=linux GOARCH=amd64 govendor build -o nasello_linux_amd64 ./cmd/nasello
-- GOOS=linux GOARCH=386 govendor build -o nasello_linux_x86 ./cmd/nasello
-- GOOS=linux GOARCH=arm govendor build -o nasello_linux_arm ./cmd/nasello
-- GOOS=darwin GOARCH=amd64 govendor build -o nasello_darwin_amd64 ./cmd/nasello
+- GOOS=linux GOARCH=amd64 go build -o nasello_linux_amd64 ./cmd/nasello
+- GOOS=linux GOARCH=386 go build -o nasello_linux_x86 ./cmd/nasello
+- GOOS=linux GOARCH=arm go build -o nasello_linux_arm ./cmd/nasello
+- GOOS=darwin GOARCH=amd64 go build -o nasello_darwin_amd64 ./cmd/nasello
 deploy:
   provider: releases
   api_key:
