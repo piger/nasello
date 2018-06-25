@@ -1,3 +1,3 @@
-module "github.com/piger/nasello"
+module github.com/piger/nasello
 
-require "github.com/miekg/dns" v1.0.4
+require github.com/miekg/dns v1.0.8
