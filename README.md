@@ -3,9 +3,8 @@
 A very simple DNS proxy server capable of routing client queries to
 different remote servers based on pattern matching.
 
-The code is mostly based on [Go-DNS][go-dns] examples.
-
-[go-dns]: http://miek.nl/projects/godns/
+This software relies heavily on [miekg](https://github.com/miekg)'s excellent
+[DNS](https://github.com/miekg/dns) library.
 
 Warning: this is alpha software and should be used with caution.
 
