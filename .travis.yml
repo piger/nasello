@@ -5,7 +5,7 @@ before_install:
   - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
   - dep ensure
 install:
-- go get github.com/golang/lint/golint
+- go get golang.org/x/lint/golint
 - go get honnef.co/go/tools/cmd/megacheck
 script:
 - test -z $(find . -path ./vendor -prune -o -name '*.go' -print | xargs gofmt -s -l)
