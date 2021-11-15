@@ -8,6 +8,27 @@ This software relies heavily on [miekg](https://github.com/miekg)'s excellent
 
 Warning: this is alpha software and should be used with caution.
 
+## NOTE
+
+You should use [coredns](https://github.com/coredns/coredns) as it covers the same use case
+as this project and much more.
+
+Example:
+
+```
+example.com {
+  forward . 208.67.222.222 208.67.220.220
+}
+
+google.com {
+  forward . 8.8.8.8 8.8.4.4
+}
+
+. {
+  forward . tls://1.1.1.1
+}
+```
+
 ## Getting Started
 
 ### Getting nasello
