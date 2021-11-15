@@ -44,11 +44,13 @@ type configFilter struct {
 func ReadConfig(filename string) Configuration {
 	file, err := ioutil.ReadFile(filename)
 	if err != nil {
-		log.Fatalf("Can't open config file: %s\n", err.Error())
+		log.Fatalf("Can't open config file: %s", err.Error())
 	}
 
 	var jsonConfig Configuration
-	json.Unmarshal(file, &jsonConfig)
+	if err := json.Unmarshal(file, &jsonConfig); err != nil {
+		log.Fatalf("Cannot parse the configuration: %s", err)
+	}
 
 	// Safety checks
 	if len(jsonConfig.Filters) == 0 {

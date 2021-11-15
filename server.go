@@ -10,11 +10,12 @@
 package nasello
 
 import (
-	"github.com/miekg/dns"
 	"log"
 	"math/rand"
 	"net"
 	"time"
+
+	"github.com/miekg/dns"
 )
 
 // Handler is the handler function that will serve DNS requests.
@@ -71,12 +72,16 @@ func ServerHandler(addresses []string, protocol string) Handler {
 		}
 
 		log.Printf("Request #%v: %.3d µs, server: %s(%s), size: %d bytes\n", resp.Id, rtt/1e3, nameserver, c.Net, resp.Len())
-		w.WriteMsg(resp)
+		if err := w.WriteMsg(resp); err != nil {
+			log.Printf("ERROR: write failed: %s", err)
+		}
 	} // end of handler
 }
 
 func sendFailure(w dns.ResponseWriter, r *dns.Msg) {
 	msg := new(dns.Msg)
 	msg.SetRcode(r, dns.RcodeServerFailure)
-	w.WriteMsg(msg)
+	if err := w.WriteMsg(msg); err != nil {
+		log.Printf("ERROR: write failed in sendFailure: %s", err)
+	}
 }
