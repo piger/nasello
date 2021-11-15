@@ -1,3 +1,4 @@
 /vendor/*/
 /nasello
 nasello.json
+dist/
